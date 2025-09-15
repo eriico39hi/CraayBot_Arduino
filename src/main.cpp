@@ -1,25 +1,42 @@
 #include <Arduino.h>
-#include <Encoder.h>
 
 const uint8_t encPinA = 2;
-const uint8_t encPinB = 3;
+const uint8_t encPinB = 4;
 
-Encoder rightEnc(encPinA, encPinB);
+int counter = 0; 
 
-long pos = -999;
+void onEncoderChange() {
+
+  int stateA = digitalRead(encPinA);
+  int stateB = digitalRead(encPinB);
+
+  if (stateA == stateB) {
+    counter ++;
+  } else {
+    counter --;
+  }
+}
 
 void setup() {
+
+  pinMode (encPinA,INPUT);
+  pinMode (encPinB,INPUT);
   Serial.begin(115200);
+
   delay(1000);
   Serial.println("Encoder reading started");
+
+  attachInterrupt(digitalPinToInterrupt(encPinA), onEncoderChange, CHANGE);
 }
 
 void loop() {
-  long newPos = rightEnc.read();
-  if (newPos != pos) {
-    pos = newPos;
+
+  static int lastCounter = 0;
+
+  if (counter != lastCounter) {
     Serial.print("Encoder position: ");
-    Serial.println(pos);
+    Serial.println(counter);
+    lastCounter = counter;
   }
-  delay(10);
+
 }
