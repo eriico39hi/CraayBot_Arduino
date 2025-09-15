@@ -1,20 +1,25 @@
 #include <Arduino.h>
+#include <Encoder.h>
 
-// put function declarations here:
-int myFunction(int, int);
+const uint8_t encPinA = 2;
+const uint8_t encPinB = 3;
+
+Encoder rightEnc(encPinA, encPinB);
+
+long pos = -999;
 
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
+  Serial.begin(115200);
+  delay(1000);
+  Serial.println("Encoder reading started");
 }
 
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH); 
-  delay(1000);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(1000);
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  long newPos = rightEnc.read();
+  if (newPos != pos) {
+    pos = newPos;
+    Serial.print("Encoder position: ");
+    Serial.println(pos);
+  }
+  delay(10);
 }
