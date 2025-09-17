@@ -20,15 +20,25 @@ void setup() {
   Serial.println("Encoder reading started");
 
   motorL.init();
+  motorR.init();
 }
 
 void loop() {
-  static int lastCounter = 0;
+  static int oldEncL = 0;
+  static int oldEncR = 0;
 
-  int currentCounter = motorL.getEncoderVal();
-  if (currentCounter != lastCounter) {
-    Serial.print("Encoder position: ");
-    Serial.println(currentCounter);
-    lastCounter = currentCounter;
+  int encL = motorL.getEncoderVal();
+  int encR = motorR.getEncoderVal();
+
+  if (oldEncL != encL) {
+    Serial.print("Left Encoder position: ");
+    Serial.println(encL);
+    oldEncL = encL;
   }
+  if (oldEncR != encR) {
+    Serial.print("Right Encoder position: ");
+    Serial.println(encR);
+    oldEncR = encR;
+  }
+
 }

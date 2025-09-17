@@ -37,7 +37,7 @@ void MotorControl::init() {
   if (isrID == 0){
     attachInterrupt(digitalPinToInterrupt(encPinA), ptrISR0, CHANGE);
   } else if (isrID == 1) {
-    attachInterrupt(digitalPinToInterrupt(encPinA), ptrISR0, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(encPinA), ptrISR1, CHANGE);
   }
 }
 
