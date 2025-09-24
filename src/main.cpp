@@ -11,8 +11,9 @@
 #include <Arduino.h>
 #include "motorcontrol.h"
 
-MotorControl motorL(2, 4);
-MotorControl motorR(3, 5);
+//MotorControl constructor args: EncPinA, EncPinB, DirPin1, DirPin2, enaPin
+MotorControl motorL(2, 4, 7, 8, 9);
+MotorControl motorR(3, 5, 11, 12, 10);
 
 void setup() {
   Serial.begin(115200);

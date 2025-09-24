@@ -15,8 +15,8 @@ MotorControl* MotorControl::instances[2] = {nullptr, nullptr};
 uint8_t MotorControl::nextIndex = 0;
 
 //Constructor: Initializes pin #'s and sets starting encoder val to 1
-MotorControl::MotorControl(uint8_t pinA, uint8_t pinB)
-  : encPinA(pinA), encPinB(pinB), encValue(0) {
+MotorControl::MotorControl(uint8_t inEncPinA, uint8_t inEncPinB, uint8_t inDirPin1, uint8_t inDirPin2, uint8_t inEnaPin)
+  : encPinA(inEncPinA), encPinB(inEncPinB), encValue(0), dirPin1(inDirPin1), dirPin2(inDirPin2), enaPin(inEnaPin) {
   if (nextIndex < 2){
     isrID = nextIndex;
     nextIndex++;
@@ -63,4 +63,21 @@ void MotorControl::onEncoderChange() {
   } else {
     encValue--;
   }
+}
+
+void MotorControl::moveMotor(uint8_t speed, bool fwdDirCtl) {
+  //initial version only to run at 100% (figure out PWM next version)
+  if (fwdDirCtl){
+    digitalWrite(dirPin1,true);
+    digitalWrite(dirPin2,false);
+  } else if (!fwdDirCtl) {
+    digitalWrite(dirPin1,false);
+    digitalWrite(dirPin2,true);
+  }
+}
+
+void MotorControl::stopMotor() {
+  digitalWrite(dirPin1,false);
+  digitalWrite(dirPin2,false);
+  digitalWrite(enaPin, false);
 }

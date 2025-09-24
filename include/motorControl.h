@@ -13,9 +13,11 @@
 
 class MotorControl {
 public:
-  MotorControl(uint8_t pinA, uint8_t pinB);
+  MotorControl(uint8_t inEncPinA, uint8_t inEncPinB, uint8_t inDirPin1, uint8_t inDirPin2, uint8_t inEnaPin);
   void init();
   int getEncoderVal() const;
+  void MotorControl::moveMotor(uint8_t speed, bool fwdDirCtl);
+  void MotorControl::stopMotor();
 
 private:
 
@@ -29,6 +31,9 @@ private:
   void onEncoderChange();
   uint8_t encPinA;
   uint8_t encPinB;
+  uint8_t dirPin1;
+  uint8_t dirPin2;
+  uint8_t enaPin;
   uint8_t isrID;
   volatile int encValue;
 
