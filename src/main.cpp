@@ -41,8 +41,24 @@ void loop() {
     Serial.println(encR);
   }
 
-  if (command == "goleft"){
-    motorL.moveMotor(100, true);
+  if (command.startsWith("goleft")){
+    int speed = 0;
+    if (command.length() > 7){
+      String speedStr = command.substring(7);
+      speed = speedStr.toInt();
+    }
+    Serial.println(speed);
+    motorL.moveMotor(speed, true);
+  }
+
+  if (command.startsWith("goright")){
+    int speed = 0;
+    if (command.length() > 7){
+      String speedStr = command.substring(7);
+      speed = speedStr.toInt();
+    }
+    Serial.println(speed);
+    motorR.moveMotor(speed, true);
   }
 
   if (command == "stop"){
