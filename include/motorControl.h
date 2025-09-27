@@ -16,8 +16,8 @@ public:
   MotorControl(uint8_t inEncPinA, uint8_t inEncPinB, uint8_t inDirPin1, uint8_t inDirPin2, uint8_t inEnaPin);
   void init();
   int getEncoderVal() const;
-  void MotorControl::moveMotor(uint8_t speed, bool fwdDirCtl);
-  void MotorControl::stopMotor();
+  void moveMotor(uint8_t speed, bool fwdDirCtl);
+  void stopMotor();
 
 private:
 
