@@ -29,6 +29,10 @@ MotorControl::MotorControl(uint8_t inEncPinA, uint8_t inEncPinB, uint8_t inDirPi
 void MotorControl::init() {
   pinMode(encPinA, INPUT);
   pinMode(encPinB, INPUT);
+  pinMode(dirPin1, OUTPUT);
+  pinMode(dirPin2, OUTPUT);
+  pinMode(enaPin, OUTPUT);
+
 
   if (isrID < 2){
     instances[isrID] = this;
@@ -74,6 +78,12 @@ void MotorControl::moveMotor(uint8_t speed, bool fwdDirCtl) {
     digitalWrite(dirPin1,false);
     digitalWrite(dirPin2,true);
   }
+  if (speed > 100){
+    speed = 100;
+  }
+  //55 = experimentally derived minpoint, 255 is max PWM
+  uint8_t PWMspd = (speed*2)+55;
+  analogWrite(enaPin,PWMspd);
 }
 
 void MotorControl::stopMotor() {

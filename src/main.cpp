@@ -1,7 +1,7 @@
 /************************************************************
  * main.cpp
  * 
- * The main code for the EricBot.
+ * The main code for the CraayBot.
  * Motor control handled by the MotorControl class now.
  * Currently just prints an encoder to the console.
  * 
@@ -27,19 +27,43 @@ void setup() {
 void loop() {
   static int oldEncL = 0;
   static int oldEncR = 0;
+  String command = Serial.readStringUntil('\n');
+  command.trim();
 
   int encL = motorL.getEncoderVal();
   int encR = motorR.getEncoderVal();
 
-  if (oldEncL != encL) {
-    Serial.print("Left Encoder position: ");
-    Serial.println(encL);
-    oldEncL = encL;
-  }
-  if (oldEncR != encR) {
-    Serial.print("Right Encoder position: ");
+
+  if (command == "readencoder"){
+    Serial.print("Left Encoder: ");
+    Serial.print(encL);
+    Serial.print(" Right Encoder: ");
     Serial.println(encR);
-    oldEncR = encR;
+  }
+
+  if (command.startsWith("goleft")){
+    int speed = 0;
+    if (command.length() > 7){
+      String speedStr = command.substring(7);
+      speed = speedStr.toInt();
+    }
+    Serial.println(speed);
+    motorL.moveMotor(speed, true);
+  }
+
+  if (command.startsWith("goright")){
+    int speed = 0;
+    if (command.length() > 7){
+      String speedStr = command.substring(7);
+      speed = speedStr.toInt();
+    }
+    Serial.println(speed);
+    motorR.moveMotor(speed, true);
+  }
+
+  if (command == "stop"){
+    motorL.stopMotor();
+    motorR.stopMotor();
   }
 
 }
