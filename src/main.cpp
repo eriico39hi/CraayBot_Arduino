@@ -9,7 +9,26 @@
  ***********************************************************/
 
 #include <Arduino.h>
-#include "motorcontrol.h"
+#include <motorControl.h>
+
+
+
+/*
+void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  if (Serial.available()) {
+    char c = Serial.read();
+    if (c == '1') digitalWrite(LED_BUILTIN, HIGH);
+    if (c == '0') digitalWrite(LED_BUILTIN, LOW);
+  }
+
+}
+*/
 
 //MotorControl constructor args: EncPinA, EncPinB, DirPin1, DirPin2, enaPin
 MotorControl motorL(2, 4, 7, 8, 9);
@@ -17,53 +36,41 @@ MotorControl motorR(3, 5, 11, 12, 10);
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);
-  Serial.println("Encoder reading started");
+  delay(2000);
 
   motorL.init();
   motorR.init();
+
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
   static int oldEncL = 0;
   static int oldEncR = 0;
-  String command = Serial.readStringUntil('\n');
-  command.trim();
 
   int encL = motorL.getEncoderVal();
   int encR = motorR.getEncoderVal();
 
+  Serial.print(encL);
+  Serial.print(",");
+  Serial.println(encR);
 
-  if (command == "readencoder"){
-    Serial.print("Left Encoder: ");
-    Serial.print(encL);
-    Serial.print(" Right Encoder: ");
-    Serial.println(encR);
-  }
+  int speed = 20;
 
-  if (command.startsWith("goleft")){
-    int speed = 0;
-    if (command.length() > 7){
-      String speedStr = command.substring(7);
-      speed = speedStr.toInt();
+  if (Serial.available()){
+    digitalWrite(LED_BUILTIN, HIGH);
+    char c = Serial.read();
+    if (c == 'f'){
+      digitalWrite(LED_BUILTIN, HIGH);
+      motorL.moveMotor(speed, true);
+      motorR.moveMotor(speed, true);
+    } else if (c == 's'){
+      digitalWrite(LED_BUILTIN, LOW);
+      motorL.stopMotor();
+      motorR.stopMotor();
     }
-    Serial.println(speed);
-    motorL.moveMotor(speed, true);
   }
 
-  if (command.startsWith("goright")){
-    int speed = 0;
-    if (command.length() > 7){
-      String speedStr = command.substring(7);
-      speed = speedStr.toInt();
-    }
-    Serial.println(speed);
-    motorR.moveMotor(speed, true);
-  }
-
-  if (command == "stop"){
-    motorL.stopMotor();
-    motorR.stopMotor();
-  }
+  delay(10);
 
 }

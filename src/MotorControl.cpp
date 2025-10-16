@@ -8,7 +8,7 @@
  ***********************************************************/
 
 
-#include "motorcontrol.h"
+#include <motorControl.h>
 
 //During initialization of the class, init some statics
 MotorControl* MotorControl::instances[2] = {nullptr, nullptr};
@@ -70,7 +70,6 @@ void MotorControl::onEncoderChange() {
 }
 
 void MotorControl::moveMotor(uint8_t speed, bool fwdDirCtl) {
-  //initial version only to run at 100% (figure out PWM next version)
   if (fwdDirCtl){
     digitalWrite(dirPin1,true);
     digitalWrite(dirPin2,false);
