@@ -28,6 +28,7 @@ void setup() {
 
 int leftSpeed = 0;
 int rightSpeed = 0;
+unsigned long prevTime = 0;
 
 void loop() {
   static int oldEncL = 0;
@@ -36,21 +37,34 @@ void loop() {
   int encL = motorL.getEncoderVal();
   int encR = motorR.getEncoderVal();
 
-  Serial.print(encL);
-  Serial.print(",");
-  Serial.println(encR);
+  //attempt to limit encoder send to stop killing the serial com...
+  unsigned long curTime = millis();
+  if (curTime - prevTime >= 50){
+    Serial.print(encL);
+    Serial.print(",");
+    Serial.println(encR);
+  }
 
-  if (Serial.available()){
-    String rcvStr = Serial.readStringUntil('\n');
-    rcvStr.trim();
+  //switched to non blocking to attempt to stop killing serial com...
+  static String inputBuffer = "";
+  while (Serial.available() > 0){
+    char inChar = Serial.read();
 
-    int commaLoc = rcvStr.indexOf(',');
-    String leftRcvStr = rcvStr.substring(0,commaLoc); 
-    String rightRcvStr = rcvStr.substring(commaLoc+1);
+    if (inChar == '\n'){
+      inputBuffer.trim();
+      int commaLoc = inputBuffer.indexOf(',');
 
-    leftSpeed = leftRcvStr.toInt();
-    rightSpeed = rightRcvStr.toInt();
+      if(commaLoc > 0){
+        String leftRcvStr = inputBuffer.substring(0,commaLoc); 
+        String rightRcvStr = inputBuffer.substring(commaLoc+1);
 
+        leftSpeed = leftRcvStr.toInt();
+        rightSpeed = rightRcvStr.toInt();
+      }
+      inputBuffer=""; //reset after parse
+    } else {
+      inputBuffer += inChar;
+    }
   }
 
   if (leftSpeed != 0){
@@ -65,6 +79,6 @@ void loop() {
     motorR.stopMotor();
   }
 
-  delay(10);
+  delay(5);
 
 }
