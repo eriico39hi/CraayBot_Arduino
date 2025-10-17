@@ -13,10 +13,10 @@
 
 class MotorControl {
 public:
-  MotorControl(uint8_t inEncPinA, uint8_t inEncPinB, uint8_t inDirPin1, uint8_t inDirPin2, uint8_t inEnaPin);
+  MotorControl(uint8_t inEncPinA, uint8_t inEncPinB, uint8_t inDirPin1, uint8_t inDirPin2, uint8_t inEnaPin, bool inNegateEnc);
   void init();
   int getEncoderVal() const;
-  void moveMotor(uint8_t speed, bool fwdDirCtl);
+  void moveMotor(int speed);
   void stopMotor();
 
 private:
@@ -35,6 +35,7 @@ private:
   uint8_t dirPin2;
   uint8_t enaPin;
   uint8_t isrID;
+  bool negateEnc;
   volatile int encValue;
 
 };

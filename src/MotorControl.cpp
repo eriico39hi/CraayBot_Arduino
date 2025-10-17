@@ -15,8 +15,8 @@ MotorControl* MotorControl::instances[2] = {nullptr, nullptr};
 uint8_t MotorControl::nextIndex = 0;
 
 //Constructor: Initializes pin #'s and sets starting encoder val to 1
-MotorControl::MotorControl(uint8_t inEncPinA, uint8_t inEncPinB, uint8_t inDirPin1, uint8_t inDirPin2, uint8_t inEnaPin)
-  : encPinA(inEncPinA), encPinB(inEncPinB), encValue(0), dirPin1(inDirPin1), dirPin2(inDirPin2), enaPin(inEnaPin) {
+MotorControl::MotorControl(uint8_t inEncPinA, uint8_t inEncPinB, uint8_t inDirPin1, uint8_t inDirPin2, uint8_t inEnaPin, bool inNegateEnc)
+  : encPinA(inEncPinA), encPinB(inEncPinB), encValue(0), dirPin1(inDirPin1), dirPin2(inDirPin2), enaPin(inEnaPin), negateEnc(inNegateEnc) {
   if (nextIndex < 2){
     isrID = nextIndex;
     nextIndex++;
@@ -62,14 +62,33 @@ void MotorControl::ptrISR1() {
 void MotorControl::onEncoderChange() {
   int stateA = digitalRead(encPinA);
   int stateB = digitalRead(encPinB);
+
+  //since motors are flipped, had to add logic for flipping direction, so wheel forward is always encoder positive
   if (stateA == stateB) {
-    encValue++;
+    if(negateEnc){
+      encValue--;
+    } else {
+      encValue++;
+    }
   } else {
-    encValue--;
+    if(negateEnc){
+      encValue++;
+    } else {
+      encValue--;
+    }
   }
 }
 
-void MotorControl::moveMotor(uint8_t speed, bool fwdDirCtl) {
+void MotorControl::moveMotor(int speed) {
+  bool fwdDirCtl;
+  uint8_t absSpd = abs(speed);
+
+  if (speed < 0) {
+    fwdDirCtl = false;
+  } else {
+    fwdDirCtl = true;
+  }
+
   if (fwdDirCtl){
     digitalWrite(dirPin1,true);
     digitalWrite(dirPin2,false);
@@ -77,11 +96,11 @@ void MotorControl::moveMotor(uint8_t speed, bool fwdDirCtl) {
     digitalWrite(dirPin1,false);
     digitalWrite(dirPin2,true);
   }
-  if (speed > 100){
-    speed = 100;
+  if (absSpd > 100){
+    absSpd = 100;
   }
   //55 = experimentally derived minpoint, 255 is max PWM
-  uint8_t PWMspd = (speed*2)+55;
+  uint8_t PWMspd = (absSpd*2)+55;
   analogWrite(enaPin,PWMspd);
 }
 

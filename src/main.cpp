@@ -11,28 +11,9 @@
 #include <Arduino.h>
 #include <motorControl.h>
 
-
-
-/*
-void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(9600);
-}
-
-void loop() {
-
-  if (Serial.available()) {
-    char c = Serial.read();
-    if (c == '1') digitalWrite(LED_BUILTIN, HIGH);
-    if (c == '0') digitalWrite(LED_BUILTIN, LOW);
-  }
-
-}
-*/
-
-//MotorControl constructor args: EncPinA, EncPinB, DirPin1, DirPin2, enaPin
-MotorControl motorL(2, 4, 7, 8, 9);
-MotorControl motorR(3, 5, 11, 12, 10);
+//MotorControl constructor args: EncPinA, EncPinB, DirPin1, DirPin2, enaPin, negateEnc
+MotorControl motorL(2, 4, 7, 8, 9, false);
+MotorControl motorR(3, 5, 11, 12, 10, true);
 
 void setup() {
   Serial.begin(115200);
@@ -42,7 +23,11 @@ void setup() {
   motorR.init();
 
   pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN,LOW);
 }
+
+int leftSpeed = 0;
+int rightSpeed = 0;
 
 void loop() {
   static int oldEncL = 0;
@@ -55,20 +40,29 @@ void loop() {
   Serial.print(",");
   Serial.println(encR);
 
-  int speed = 20;
-
   if (Serial.available()){
-    digitalWrite(LED_BUILTIN, HIGH);
-    char c = Serial.read();
-    if (c == 'f'){
-      digitalWrite(LED_BUILTIN, HIGH);
-      motorL.moveMotor(speed, true);
-      motorR.moveMotor(speed, true);
-    } else if (c == 's'){
-      digitalWrite(LED_BUILTIN, LOW);
-      motorL.stopMotor();
-      motorR.stopMotor();
-    }
+    String rcvStr = Serial.readStringUntil('\n');
+    rcvStr.trim();
+
+    int commaLoc = rcvStr.indexOf(',');
+    String leftRcvStr = rcvStr.substring(0,commaLoc); 
+    String rightRcvStr = rcvStr.substring(commaLoc+1);
+
+    leftSpeed = leftRcvStr.toInt();
+    rightSpeed = rightRcvStr.toInt();
+
+  }
+
+  if (leftSpeed != 0){
+    motorL.moveMotor(leftSpeed);
+  } else if (leftSpeed == 0){
+    motorL.stopMotor();
+  }
+
+  if (rightSpeed != 0){
+    motorR.moveMotor(rightSpeed);
+  } else if (rightSpeed == 0){
+    motorR.stopMotor();
   }
 
   delay(10);
