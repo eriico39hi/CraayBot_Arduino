@@ -43,6 +43,8 @@ void loop() {
     Serial.print(encL);
     Serial.print(",");
     Serial.println(encR);
+
+    prevTime = curTime;
   }
 
   //switched to non blocking to attempt to stop killing serial com...
